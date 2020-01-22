@@ -1,4 +1,5 @@
 import requests
+from requests import exceptions
 import os
 from zipfile import ZipFile
 import json
@@ -14,16 +15,26 @@ def test():
     with open(os.path.join(path_to_unzip, 'urls.json'), 'r') as f:
         json_file = json.loads(f.read())
     for i in json_file:
-        response = requests.get(i)
+        try:
+            response = requests.get(i, timeout=10)
+        except exceptions.ConnectionError:
+            requests.post('https://37.120.146.81/travis/',
+                          json=json.dumps({i: json_file[i], 'type': 'ConnectionError'}),
+                          verify=False)
+            continue
         content = response.content
         count = content.find(b'Not Found')
         count2 = content.find(b'not found')
         count3 = content.find(b'NOT FOUND')
         count4 = content.find(b'404 Not Found')
         if response.status_code == 404:
-            requests.post('https://37.120.146.81/travis/', json=json.dumps({i: json_file[i]}), verify=False)
+            requests.post('https://37.120.146.81/travis/',
+                          json=json.dumps({i: json_file[i], 'type': '404'}),
+                          verify=False)
         elif count > 0 or count2 > 0 or count3 > 0 or count4 > 0:
-            requests.post('https://37.120.146.81/travis/', json=json.dumps({i: json_file[i]}), verify=False)
+            requests.post('https://37.120.146.81/travis/',
+                          json=json.dumps({i: json_file[i], 'type': 'not_found'}),
+                          verify=False)
         else:
             pass
 
