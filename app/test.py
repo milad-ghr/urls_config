@@ -3,7 +3,7 @@ import os
 from zipfile import ZipFile
 import json
 
-from json import BASE_DIR
+from json_folder import BASE_DIR
 
 
 def test():
