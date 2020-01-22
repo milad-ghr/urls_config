@@ -1,3 +1,2 @@
-tox-travis
 requests
 urllib3
