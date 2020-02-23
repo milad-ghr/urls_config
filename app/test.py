@@ -7,14 +7,8 @@ import json
 from json_folder import BASE_DIR
 
 
-def test():
-    file = os.path.join(BASE_DIR, 'urls.zip')
-    path_to_unzip = os.path.join(BASE_DIR)
-    zipfile = ZipFile(file, 'r')
-    zipfile.extractall(path=path_to_unzip)
-    with open(os.path.join(path_to_unzip, 'urls.json'), 'r') as f:
-        json_file = json.loads(f.read())
-    for i in json_file:
+def request(data, json_file):
+    for i in data:
         try:
             response = requests.get(i, timeout=10)
         except exceptions.ConnectionError:
@@ -37,4 +31,25 @@ def test():
                           verify=False)
         else:
             pass
+
+
+def test():
+    file = os.path.join(BASE_DIR, 'urls.zip')
+    path_to_unzip = os.path.join(BASE_DIR)
+    zipfile = ZipFile(file, 'r')
+    zipfile.extractall(path=path_to_unzip)
+    with open(os.path.join(path_to_unzip, 'urls.json'), 'r') as f:
+        json_file = json.loads(f.read())
+    urls = list(json_file.keys())
+    counter = 0
+    for data in range(0, len(urls), 1000):
+        if data > 360000:
+            request(urls[counter:len(urls)], json_file)
+        else:
+            request(urls[counter:data], json_file)
+            counter += data
+        print(f'done from {counter} to {data}')
+    return 'done'
+
+
 
