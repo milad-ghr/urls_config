@@ -7,7 +7,7 @@ import json
 from json_folder import BASE_DIR
 
 
-def request(data, json_file):
+def request(data, json_file, counter):
     for i in data:
         try:
             response = requests.get(i, timeout=10)
@@ -31,6 +31,7 @@ def request(data, json_file):
                           verify=False)
         else:
             pass
+        print(f'Done url {i} in range gt {counter}')
 
 
 def test():
@@ -42,11 +43,11 @@ def test():
         json_file = json.loads(f.read())
     urls = list(json_file.keys())
     counter = 0
-    for data in range(0, len(urls), 1000):
+    for data in range(0, len(urls), 500):
         if data > 360000:
-            request(urls[counter:len(urls)], json_file)
+            request(urls[counter:len(urls)], json_file, counter)
         else:
-            request(urls[counter:data], json_file)
+            request(urls[counter:data], json_file, counter)
             counter += data
         print(f'done from {counter} to {data}')
     return 'done'
